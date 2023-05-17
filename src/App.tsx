@@ -1,19 +1,24 @@
-import { Redirect, Route } from 'react-router-dom';
+import React, { useRef, useState } from "react";
 import {
   IonApp,
+  IonButton,
+  IonCard,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonHeader,
   IonIcon,
+  IonInput,
+  IonItem,
   IonLabel,
-  IonRouterOutlet,
-  IonTabBar,
-  IonTabButton,
-  IonTabs,
+  IonRow,
+  IonTitle,
+  IonToolbar,
+  IonCardContent,
   setupIonicReact
 } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { ellipse, square, triangle } from 'ionicons/icons';
-import Tab1 from './pages/Tab1';
-import Tab2 from './pages/Tab2';
-import Tab3 from './pages/Tab3';
+
+import {calculatorOutline, refreshOutline} from 'ionicons/icons'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -36,41 +41,83 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <Route exact path="/tab1">
-            <Tab1 />
-          </Route>
-          <Route exact path="/tab2">
-            <Tab2 />
-          </Route>
-          <Route path="/tab3">
-            <Tab3 />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/tab1" />
-          </Route>
-        </IonRouterOutlet>
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon aria-hidden="true" icon={triangle} />
-            <IonLabel>Tab 1</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon aria-hidden="true" icon={ellipse} />
-            <IonLabel>Tab 2</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon aria-hidden="true" icon={square} />
-            <IonLabel>Tab 3</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  const [calculatedBmi, setCalculatedBmi] = useState<number>();
+
+  const weightInputRef = useRef<HTMLIonInputElement>(null);
+  const heightInputRef = useRef<HTMLIonInputElement>(null);
+
+  const calculateBMI = () => {
+    const enteredWeight = weightInputRef.current!.value;
+    const enteredHeight = heightInputRef.current!.value;
+    if (!enteredHeight || !enteredWeight) {
+      return;
+    }
+    const bmi = +enteredWeight / (+enteredHeight * +enteredHeight);
+
+    setCalculatedBmi(bmi);
+  };
+  const resetInputs = () => {
+    weightInputRef.current!.value = "";
+    heightInputRef.current!.value = "";
+  };
+
+  return (
+    <IonApp>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>BMI Calculator</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent>
+        <IonGrid>
+          <IonRow>
+            <IonCol>
+              <IonItem>
+                <IonLabel position="floating">Your Height</IonLabel>
+                <IonInput ref={heightInputRef}></IonInput>
+              </IonItem>
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <IonItem>
+                <IonLabel position="floating">Your Weight</IonLabel>
+                <IonInput ref={weightInputRef}></IonInput>
+              </IonItem>
+            </IonCol>
+          </IonRow>
+
+          <IonRow>
+            <IonCol className="ion-text-left">
+              <IonButton onClick={calculateBMI}>
+                <IonIcon slot="start" icon={calculatorOutline}></IonIcon>
+                Calculate
+              </IonButton>
+            </IonCol>
+            <IonCol className="ion-text-right">
+              <IonButton onClick={resetInputs}>
+                <IonIcon slot="start" icon={refreshOutline}></IonIcon>
+                Reset
+              </IonButton>
+            </IonCol>
+          </IonRow>
+          {calculatedBmi && (
+            <IonRow>
+              <IonCol>
+                <IonCard color={"light"}>
+                  <IonCardContent>
+                    <h2>{calculatedBmi}</h2>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          )}
+        </IonGrid>
+      </IonContent>
+    </IonApp>
+  );
+};
+
 
 export default App;
