@@ -63,7 +63,6 @@ const App: React.FC = () => {
     weightInputRef.current!.value = "";
     heightInputRef.current!.value = "";
   };
-
   return (
     <IonApp>
       <IonHeader>
